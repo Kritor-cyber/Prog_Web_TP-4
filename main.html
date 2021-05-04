@@ -19,7 +19,7 @@
         <nav>
             <ol>
                 <li class="crumb"><button type="button" onclick="showUsers()">UTILISATEURS</button></li>
-                <li class="crumb"><button type="button">TÂCHES</button></li>
+                <li class="crumb"><button type="button" onclick="showTasks()">TÂCHES</button></li>
             </ol>
         </nav>
     </div>
@@ -48,8 +48,8 @@
                 </fieldset>
             </form>
 
-            <div class="divTable" id="tableauUtilisateurs">
-                <table class="tableau">
+            <div class="divTable">
+                <table class="tableau" id="tableauUtilisateurs">
                     <thead>
                         <tr>
                             <th class="cellule">Prénom</th>
@@ -182,7 +182,7 @@
                             ajoutPossible = false;  // Impossibilité d'ajouter un nouvel élément tant que 10 secondes ne se sont pas écouler
                             reinitialisationBoutonAjouter();
                             // Ajout du tr au tableau sur la page web
-                            var tbody = document.getElementById("tableau").children[1];
+                            var tbody = document.getElementById("tableauUtilisateurs").children[1];
 
                             tbody.appendChild(tr);
 

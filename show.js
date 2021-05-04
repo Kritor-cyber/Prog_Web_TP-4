@@ -1,6 +1,5 @@
-showTasks();
-//showUsers();
-getTasks();
+//showTasks();
+showUsers();
 
 var numberElement = 10;
 var firstElement = 0;
@@ -13,6 +12,7 @@ function showUsers()
 
 function showTasks()
 {
+    getTasks();
     document.getElementById("tableauUtilisateurs").style.display = "none";
     document.getElementById("tableauTaches").style.display = "block";
 }
@@ -20,6 +20,7 @@ function showTasks()
 function getTasks()
 {
     viderTableauTaches();
+    alert("TELECHARGEMENT DE DONN2ES");
     fetch("https://jsonplaceholder.typicode.com/todos").then(response => response.json()).then(function(data) {
         // Affiche les 200 données récupérées à l'adresse : https://jsonplaceholder.typicode.com/todos, chaque données étant caractéristées par un 'userID', un 'id', un titre : 'title' et un booleén indiquant si la tache a été complétée
         //console.log('data', data);

@@ -1,0 +1,143 @@
+.main {
+    font-family: Calibri, Consolas, Verdana;
+    box-sizing: border-box;
+    background-color: rgb(211, 211, 211);
+}
+
+img {
+    margin-top: 10%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    background-size: cover;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    /* Image en rond */
+    border-radius: 50%;
+    box-shadow: 10px 5px 5px rgb(8, 55, 98);
+    margin-bottom: 5px;
+    aspect-ratio: 1 / 1;
+}
+
+.imgContainer {
+    display: block;
+}
+
+.entree {
+    margin-right: 5px;
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid rgb(211, 211, 211);
+    padding-bottom: 3px;
+    margin-bottom: 5px;
+    caret-color: black;
+    transition: border-bottom 1s;
+    transition: caret-color 1s;
+}
+
+.entree:invalid {
+    border-bottom: 2px solid rgb(255, 80, 80);
+    caret-color: rgb(255, 80, 80);
+    transition: border-bottom 1s;
+    transition: caret-color 1s;
+}
+
+.mainBody {
+    /* Ajout de l'ombre */
+    box-shadow: 10px 5px 5px rgb(128, 128, 128);
+    padding: 13px;
+    background-color: white;
+    /* Pour garder les enfants du <form> à gauche */
+    text-align: left;
+    width: auto;
+}
+
+#divTable {
+    /* Scroll horizontal nécessaire */
+    overflow-x: auto;
+}
+
+#buttonsContainer {
+    display: flex;
+    flex-direction: row;
+    /* Pour avoir un affichage propre sur de petits écrans (sur plusieurs lignes si nécessaire) */
+    flex-wrap: wrap;
+}
+
+#boutonAjouter {
+    background-color: rgb(50, 50, 50);
+    border-radius: 14px 14px;
+}
+
+button {
+    text-transform: uppercase;
+    border: none;
+    box-shadow: 5px 3px 3px rgb(200, 200, 200);
+    background-color: rgb(220, 220, 220);
+    padding: 5px;
+    transition: background-color 1s;
+    border-radius: 14px 14px;
+    transition: border-radius 0.5s;
+}
+
+button:hover {
+    background-color: rgb(127, 127, 127);
+    transition: background-color 1s;
+    border-radius: 7px 7px;
+    transition: border-radius 0.5s;
+}
+
+@media (min-width: 1000px) {
+    .mainBody {
+        width: 1000px;
+    }
+}
+
+@media (max-width: 1000px) {
+    #buttonsContainer {
+        display: flex;
+        flex-direction: column;
+        /* Pour avoir un affichage propre sur de petits écrans (sur plusieurs lignes si nécessaire) */
+        flex-wrap: wrap;
+    }
+}
+
+/* TP 3 */
+#tableau {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-collapse: collapse;
+    display: table;
+}
+
+.cellule, .celluleDerniereLigne {
+    text-align: center;
+    padding: 10px;
+}
+
+.cellule {
+    border-style: inset;
+    border-width: 1px;
+}
+
+.celluleDerniereLigne {
+    border-style: none;
+}
+
+#formulaire {
+    background-color: white;
+    position: sticky;
+    top: 10px;
+    transform: rotateZ(0);
+    transition: transform 1s;
+}
+
+#formulaire2 {
+    background-color: white;
+    position: sticky;
+    top: 10px;
+    transform: rotateZ(180deg);
+    transition: transform 1s;
+}

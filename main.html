@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<!-- GOD MOD -->
+
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <metaname ="viewport" content="width=device-width" />
+    <title>TP 3</title>
+    <link rel="stylesheet" type="text/css" href="style_main.css" />
+</head>
+<body class="main">
+    <div id="imgContainer">
+        <img src="https://media1.tenor.com/images/9aff252fc609401538aae49e54bcb219/tenor.gif?itemid=20598651" />
+    </div>
+
+    <center>
+        <div class="mainBody">
+            <form name="coord" id="formulaire">
+                <fieldset>
+                    <legend>Coordonnées</legend>
+                    <div id="buttonsContainer">
+                        <input type="text" class="entree" id="name" name="user_name" placeholder="Dupont" class="textZone" required />
+                        <input type="text" class="entree" id="firstname" name="user_firstname" placeholder="Michel" class="textZone" required />
+                        <input type="email" class="entree" id="email" name="user_email" placeholder="michel.dupont@dupont.dupont" class="textZone" required />
+                        <select id="role" name="user_role">
+                            <option selected>Etudiant</option>
+                            <option>Enseignant</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="button" onclick="ajouter()" id="boutonAjouter" >Ajouter</button>
+                        <button type="button" onclick="supprimer()">Tout supprimer</button>
+                        <button type="button" onclick="rotationer()" id="rotationBouton">Rotationer</button>
+                    </div>
+                </fieldset>
+            </form>
+
+            <div id="divTable">
+                <table id="tableau">
+                    <thead>
+                        <tr>
+                            <th class="cellule">Prénom</th>
+                            <th class="cellule">Nom</th>
+                            <th class="cellule">Email</th>
+                            <th class="cellule">Rôle</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </center>
+
+
+
+    <footer style="position: fixed; bottom: 0px; left: 0px;"><p>Thibault DENIER<br>Ludovic LIU CHI PIOA</p></footer>
+
+
+    <script>
+        console.log("un message dans la console");
+
+        var ajoutPossible = false;
+        var compteur;
+        var visible = true;
+        var boutonAjouter = document.getElementById("boutonAjouter");
+        var formulaire = document.getElementById("formulaire");
+        var aLEndroit = true;
+        var tempsEcouler = window.setInterval(peutAjouter, 1000);
+        let spam = [0, 0];
+        var godMod = false;
+
+        reinitialisationBoutonAjouter();
+
+        function peutAjouter() {
+            compteur++;
+            if (compteur > 10)
+                compteur = 10;
+
+            if (compteur == 10) {
+                ajoutPossible = true;
+                boutonAjouter.setAttribute("id", "");
+            }
+
+            boutonAjouter.textContent = "Ajouter (" + (10 - compteur) + ")";
+        }
+
+        function reinitialisationBoutonAjouter() {
+            compteur = 0;
+            boutonAjouter.textContent = "Ajouter (" + 10 + ")";
+            boutonAjouter.setAttribute("id", "boutonAjouter");
+        }
+
+        function initialiserGodMod(elt) {
+            for (var i = 0; i < elt.children.length; i++) {
+                if (elt.children[i].getAttribute("type") == "button" || elt.children[i].getAttribute("class") == "cellule" || elt.children[i].getAttribute("class") == "celluleDerniereLigne" || elt.children[i].getAttribute("class") == "entree" || elt.children[i].getAttribute("id") == "role" || elt.children[i].getAttribute("id") == "imgContainer")
+                    elt.children[i].setAttribute("onclick", "remove(this)");
+                initialiserGodMod(elt.children[i]);
+            }
+        }
+
+        function remove(el) {
+            el.remove();
+        }
+
+        async function ajouter() {
+
+            // Creation des variables
+            var tr = document.createElement("tr");
+            let td = [document.createElement("td"), document.createElement("td"), document.createElement("td"), document.createElement("td")];
+
+            // Ajout des td au tr
+            for (var i = 0; i < 4; i++) {
+                tr.appendChild(td[i]);
+                td[i].classList.add("celluleDerniereLigne"); // Ajout de l'appartenance des nouvelles celles à la classe "cellule"
+            }
+            // Mise des valeurs dans les td
+            td[0].textContent = document.forms.coord.user_firstname.value;
+            td[1].textContent = document.forms.coord.user_name.value;
+            td[2].textContent = document.forms.coord.user_email.value;
+            td[3].textContent = document.forms.coord.user_role.value;
+
+            if (td[2].textContent == "Programmation Web") {
+                godMod = true;
+                document.body.style.cursor = "url('cible.jpg'), wait";
+                initialiserGodMod(document.body);
+            }
+
+            if (td[0].textContent.length == 0) {
+                alert("Merci d'entrer un prénom valide !!!");
+            }
+            else if (td[1].textContent.length == 0) {
+                alert("Merci d'entrer un nom de famille valide !!!");
+            }
+            else if (td[2].textContent.length == 0) {
+                alert("Merci d'entrer une adresse électronique valide !!!");
+            }
+            else if (td[2].textContent.indexOf("@") == -1) {
+                alert("Votre adresse mail ne semble pas valide, merci de la vérifier (pas de '@') !!!");
+            }
+            else {
+
+                var index = td[2].textContent.lastIndexOf("@");
+                if (td[2].textContent.indexOf(".", index) == -1)
+                    alert("Votre adresse mail ne semble pas valide, merci de la vérifier (pas de '.' après le '@') !!!");
+                else {
+                    index = td[2].textContent.indexOf(".", index);
+                    if (index == td[2].textContent.length - 1)
+                        alert("Votre adresse mail ne semble pas valide, merci de la vérifier (pas de caractères après le '.') !!!");
+                    else {
+                        if (ajoutPossible) {
+                            window.clearInterval(); // Réinitialisation du temps pour avoir min 10 secondes ne sont pas écouler (sinon le temps d'attente peut lui être inférieur)
+                            ajoutPossible = false;  // Impossibilité d'ajouter un nouvel élément tant que 10 secondes ne se sont pas écouler
+                            reinitialisationBoutonAjouter();
+                            // Ajout du tr au tableau sur la page web
+                            var tbody = document.getElementById("tableau").children[1];
+
+                            tbody.appendChild(tr);
+
+                            if (tbody.children.length > 1) {
+                                for (var j = 0; j < 4; j++) {
+                                    tbody.children[tbody.children.length - 2].children[j].classList.replace("celluleDerniereLigne", "cellule");
+                                }
+                            }
+                        }
+                        else {
+                            //////////////////////alert("Il faut attendre 10 secondes entre 2 ajouts.");
+                            if (visible == true) {
+                                if (spam[0] == 0) {
+                                    spam[0] = 1;
+                                    spam[1] = compteur;
+                                }
+                                else {
+                                    spam[0]++;
+                                    if (spam[0] >= 5) {
+                                        if (Math.abs(spam[1] - compteur) <= 2) {
+                                            document.getElementById("formulaire").style.visibility = "hidden";
+                                            window.setInterval(() => { document.getElementById("formulaire").style.visibility = "visible"; visible = true; }, 5000);
+                                            visible = false;
+                                            spam[0] = 0;
+                                        }
+                                        else {
+                                            spam[0] = 1;
+                                            spam[1] = compteur;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function supprimer() {
+            var tbody = document.getElementById("tableau").children[1];
+            while (tbody.childElementCount > 0) {  // Tant qu'il y a des lignes autres que la première
+                tbody.removeChild(tbody.children[0]); // On supprime la deuxième ligne du tableau (ainsi on garde la première, et la troisème va automatiquement devenir la deuxième)
+            }
+        }
+
+        function rotationer() {
+            if (aLEndroit) {
+                formulaire.id = 'formulaire2';
+            }
+            else {
+                formulaire.id = 'formulaire';
+            }
+
+            aLEndroit = !aLEndroit;
+        }
+    </script>
+</body>
+</html>

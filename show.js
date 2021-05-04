@@ -20,18 +20,25 @@ function showTasks()
 function getTasks()
 {
     viderTableauTaches();
-    alert("TELECHARGEMENT DE DONN2ES");
-    fetch("https://jsonplaceholder.typicode.com/todos").then(response => response.json()).then(function(data) {
-        // Affiche les 200 données récupérées à l'adresse : https://jsonplaceholder.typicode.com/todos, chaque données étant caractéristées par un 'userID', un 'id', un titre : 'title' et un booleén indiquant si la tache a été complétée
-        //console.log('data', data);
+
+    let nomUtilisateurs = [];
+    fetch("https://jsonplaceholder.typicode.com/users").then(response => response.json()).then(function(data) {
         data.forEach(function(item, index, array) {
-            if (index >= firstElement && index < firstElement + numberElement)
-                createTask(item['userId'], item['id'], item['title'], item['completed']);
+            nomUtilisateurs[parseInt(item['id'])] = item['name'];
           });
-    });
+    }).then(function() { // Permet d'attendre que l'association des noms aux identifiants soit terminée avant d'ajouter les valeurs au tableau
+        fetch("https://jsonplaceholder.typicode.com/todos").then(response => response.json()).then(function(data) {
+            data.forEach(function(item, index, array) {
+                if (index >= firstElement && index < firstElement + numberElement) {
+                    console.log(nomUtilisateurs[parseInt(item['userId'])] + " : " + parseInt(item['userId']));
+                    createTask(nomUtilisateurs[parseInt(item['userId'])], item['id'], item['title'], item['completed']);
+                }
+            });
+        });
+     });    
 }
 
-function createTask(userId, id, title, completed)
+function createTask(userName, id, title, completed)
 {
     var tr = document.createElement("tr");
     let td = [document.createElement("td"), document.createElement("td"), document.createElement("td"), document.createElement("td")];
@@ -42,7 +49,7 @@ function createTask(userId, id, title, completed)
         td[i].classList.add("celluleDerniereLigne"); // Ajout de l'appartenance des nouvelles celles à la classe "cellule"
     }
     // Mise des valeurs dans les td
-    td[0].innerText = userId;
+    td[0].innerText = userName;
     td[1].innerText = id;
     td[2].innerText = title;
     td[3].innerText = completed ? "OUI" : "NON";

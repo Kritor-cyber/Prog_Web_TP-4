@@ -18,7 +18,7 @@
     <div style="text-align: center;">
         <nav>
             <ol>
-                <li class="crumb"><button type="button">UTILISATEURS</button></li>
+                <li class="crumb"><button type="button" onclick="showUsers()">UTILISATEURS</button></li>
                 <li class="crumb"><button type="button">TÂCHES</button></li>
             </ol>
         </nav>
@@ -48,7 +48,7 @@
                 </fieldset>
             </form>
 
-            <div class="divTable">
+            <div class="divTable" id="tableauUtilisateurs">
                 <table class="tableau">
                     <thead>
                         <tr>
@@ -64,28 +64,28 @@
         </div>
     </center>
 
-    <h1 style="margin-bottom: 0px;">Tâches</h1>
-    <div class="mainBody">
-        <div class="divTable">
-            <table class="tableau">
-                <thead>
-                    <tr>
-                        <th class="cellule">USER ID</th>
-                        <th class="cellule">ID</th>
-                        <th class="cellule">TITRE</th>
-                        <th class="cellule">TERMINE</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+    <div id="tableauTaches">
+        <h1 style="margin-bottom: 0px;">Tâches</h1>
+        <div class="mainBody">
+            <div class="divTable">
+                <table class="tableau">
+                    <thead>
+                        <tr>
+                            <th class="cellule">USER ID</th>
+                            <th class="cellule">ID</th>
+                            <th class="cellule">TITRE</th>
+                            <th class="cellule">TERMINE</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-
-
     <footer style="position: fixed; bottom: 0px; left: 0px;"><p>Thibault DENIER<br>Ludovic LIU CHI PIOA</p></footer>
 
-
+    <script type="text/javascript" src="show.js"></script>
     <script>
         console.log("un message dans la console");
 

@@ -48,20 +48,20 @@ img {
     box-shadow: 10px 5px 5px rgb(128, 128, 128);
     padding: 13px;
     background-color: white;
-    /* Pour garder les enfants du <form> à gauche */
+    /* Pour garder les enfants du <form> ï¿½ gauche */
     text-align: left;
     width: auto;
 }
 
-#divTable {
-    /* Scroll horizontal nécessaire */
+.divTable {
+    /* Scroll horizontal nï¿½cessaire */
     overflow-x: auto;
 }
 
 #buttonsContainer {
     display: flex;
     flex-direction: row;
-    /* Pour avoir un affichage propre sur de petits écrans (sur plusieurs lignes si nécessaire) */
+    /* Pour avoir un affichage propre sur de petits ï¿½crans (sur plusieurs lignes si nï¿½cessaire) */
     flex-wrap: wrap;
 }
 
@@ -98,13 +98,13 @@ button:hover {
     #buttonsContainer {
         display: flex;
         flex-direction: column;
-        /* Pour avoir un affichage propre sur de petits écrans (sur plusieurs lignes si nécessaire) */
+        /* Pour avoir un affichage propre sur de petits ï¿½crans (sur plusieurs lignes si nï¿½cessaire) */
         flex-wrap: wrap;
     }
 }
 
 /* TP 3 */
-#tableau {
+.tableau {
     width: 100%;
     margin-top: 5px;
     margin-bottom: 5px;

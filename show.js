@@ -1,3 +1,6 @@
+//showTasks();
+showUsers();
+
 function showUsers()
 {
     document.getElementById("tableauUtilisateurs").style.display = "table";

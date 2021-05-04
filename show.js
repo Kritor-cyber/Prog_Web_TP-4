@@ -1,6 +1,9 @@
-//showTasks();
-showUsers();
+showTasks();
+//showUsers();
 getTasks();
+
+var numberElement = 10;
+var firstElement = 0;
 
 function showUsers()
 {
@@ -16,11 +19,13 @@ function showTasks()
 
 function getTasks()
 {
+    viderTableauTaches();
     fetch("https://jsonplaceholder.typicode.com/todos").then(response => response.json()).then(function(data) {
         // Affiche les 200 données récupérées à l'adresse : https://jsonplaceholder.typicode.com/todos, chaque données étant caractéristées par un 'userID', un 'id', un titre : 'title' et un booleén indiquant si la tache a été complétée
         //console.log('data', data);
         data.forEach(function(item, index, array) {
-            createTask(item['userId'], item['id'], item['title'], item['completed']);
+            if (index >= firstElement && index < firstElement + numberElement)
+                createTask(item['userId'], item['id'], item['title'], item['completed']);
           });
     });
 }
@@ -42,4 +47,44 @@ function createTask(userId, id, title, completed)
     td[3].innerText = completed ? "OUI" : "NON";
     
     document.getElementById("tableTasks").children[1].appendChild(tr);
+}
+
+
+
+document.getElementById('numberElement').onchange = selectNumberElement;
+
+function selectNumberElement()
+{
+    numberElement = parseInt(this.value);
+    verifyFirstElement();
+    getTasks(); // Plus long mais permet de ne pas conserver les 200 valeurs en mémoire
+}
+
+function getPreviousTasks()
+{
+    firstElement -= numberElement;
+    verifyFirstElement();
+
+    getTasks();
+}
+
+function getNextTasks()
+{
+    firstElement += numberElement;
+    verifyFirstElement();
+
+    getTasks();
+}
+
+function verifyFirstElement()
+{
+    if (firstElement < 0)
+        firstElement = 0;
+    else if (firstElement > 199-numberElement) // Le tableau de données est limités à 200 valeurs car nous ne retenons pas le tableau en mémoire donc nous ne pouvons pas connaitre la taille du tableau (on pourrait mais ce serait beaucoup plus lourd en calcul)
+        firstElement = 199-numberElement;
+}
+
+function viderTableauTaches()
+{
+    document.getElementById("tableTasks").children[1].innerHTML = "";
 }

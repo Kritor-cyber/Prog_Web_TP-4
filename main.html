@@ -67,6 +67,14 @@
     <div id="tableauTaches">
         <h1 style="margin-bottom: 0px;">Tâches</h1>
         <div class="mainBody">
+            <button type="button" onclick="getPreviousTasks()"><</button>
+            <select id="numberElement" name="number_element">
+                <option value="10" class="numberSelection" selected>10 par page</option>
+                <option value="20" class="numberSelection" >20 par page</option>
+                <option value="50" class="numberSelection" >50 par page</option>
+                <option value="100" class="numberSelection" >100 par page</option>
+            </select>
+            <button type="button" onclick="getNextTasks()">></button>
             <div class="divTable">
                 <table class="tableau" id="tableTasks">
                     <thead>
@@ -224,7 +232,7 @@
         function supprimer() {
             var tbody = document.getElementById("tableau").children[1];
             while (tbody.childElementCount > 0) {  // Tant qu'il y a des lignes autres que la première
-                tbody.removeChild(tbody.children[0]); // On supprime la deuxième ligne du tableau (ainsi on garde la première, et la troisème va automatiquement devenir la deuxième)
+                tbody.removeChild(tbody.children[0]); // On supprime la première ligne du tableau et la troisème va automatiquement devenir la deuxième, etc
             }
         }
 

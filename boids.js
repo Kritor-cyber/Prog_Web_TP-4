@@ -64,7 +64,7 @@ document.body.appendChild(drawingZone);
 var squareRotation = 0.0;
 
 let boids = [];
-for (var i = 0; i < 1000; i++)
+for (var i = 0; i < 100; i++)
 {
     boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.random(), Math.random()) ));
 }
@@ -173,10 +173,10 @@ function initBuffers(gl) {
 
     // Ici on définit la forme des objets
     const positions = [
-        -0.05, -0.05,
-        0.05, 0.0,
-        -0.025, 0.0,
-        -0.05, 0.05,
+        -0.1, -0.1,
+        0.1, 0.0,
+        -0.05, 0.0,
+        -0.1, 0.1,
     ];
 
 
@@ -313,15 +313,15 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
         {
             if (i != j) // On ne compare pas un individu à lui-même
             {
-                if (boids[i].getDistance(boids[j]) < 0.1) // Trop proche
+                if (boids[i].getDistance(boids[j]) < 0.2) // Trop proche
                 {
                     boidsTropProche.push(boids[j]);
                 }
-                else if (boids[i].getDistance(boids[j]) < 0.2) // Un Peu Trop proche
+                else if (boids[i].getDistance(boids[j]) < 0.4) // Un Peu Trop proche
                 {
                     boidsUnPeuProche.push(boids[j]);
                 }
-                else if (boids[i].getDistance(boids[j]) < 0.3) // Un Peu Loin
+                else if (boids[i].getDistance(boids[j]) < 0.6) // Un Peu Loin
                 {
                     boidsUnPeuLoin.push(boids[j]);
                 }

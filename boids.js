@@ -64,9 +64,9 @@ document.body.appendChild(drawingZone);
 var squareRotation = 0.0;
 
 let boids = [];
-for (var i = 0; i < 100; i++)
+for (var i = 0; i < 1000; i++)
 {
-    boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.random(), Math.random()) ));
+    boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.random()*2 - 1, Math.random()*2 - 1) ));    // (... * 2 - 1) pour avoir des directions réellement aléatoire (et pas uniquement entre nord et est)
 }
 console.log(boids);
 console.log("initialisation fini");
@@ -317,11 +317,11 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
                 {
                     boidsTropProche.push(boids[j]);
                 }
-                else if (boids[i].getDistance(boids[j]) < 0.4) // Un Peu Trop proche
+                else if (boids[i].getDistance(boids[j]) < 0.3) // Un Peu Trop proche
                 {
                     boidsUnPeuProche.push(boids[j]);
                 }
-                else if (boids[i].getDistance(boids[j]) < 0.6) // Un Peu Loin
+                else if (boids[i].getDistance(boids[j]) < 0.4) // Un Peu Loin
                 {
                     boidsUnPeuLoin.push(boids[j]);
                 }
@@ -331,6 +331,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
         var facteur1 = new Position(0, 0);
         var facteur2 = new Position(0, 0);
         var facteur3 = new Position(0, 0);
+        var facteur4 = new Position(0, 0);
 
         if (boidsTropProche.length > 0)     // RULE "2"
         {
@@ -360,7 +361,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
             {
                 facteur3.ajouter(boidsUnPeuLoin[j].getPosition().getX(), boidsUnPeuLoin[j].getPosition().getY());
             }
-            facteur3.setX(facteur3.getX() / boidsUnPeuLoin.length);    // Calcul de la moyenne des éléments proches avec une importance inversement proportionnelle à la distance
+            facteur3.setX(facteur3.getX() / boidsUnPeuLoin.length);
             facteur3.setY(facteur3.getY() / boidsUnPeuLoin.length);
 
             facteur3.setX((facteur3.getX() - boids[i].getPosition().getX()) / 100);
@@ -369,7 +370,12 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 
         }
 
-        boids[i].setVelocity(new Position(boids[i].getVelocity().getX() + facteur1.getX() + facteur2.getX() + facteur3.getX(), boids[i].getVelocity().getY() + facteur1.getY() + facteur2.getY() + facteur3.getY() ));
+        if (boids[i].getPosition().getDistance(new Position(0, 0)) > 5)     // Vers l'infini et au dela (ou pas)
+        {
+            facteur4.ajouter(-boids[i].getPosition().getX() / 100, -boids[i].getPosition().getY() / 100);
+        }
+
+        boids[i].setVelocity(new Position(boids[i].getVelocity().getX() + facteur1.getX() + facteur2.getX() + facteur3.getX() + facteur4.getX(), boids[i].getVelocity().getY() + facteur1.getY() + facteur2.getY() + facteur3.getY() + facteur4.getY() ));
     }
     
 
@@ -378,25 +384,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     // Pour ne pas disparaitre de l'écran
     for (var i = 0; i < boids.length; i++)
     {
-        boids[i].getPosition().ajouter(boids[i].getVelocity().getX() / 20, boids[i].getVelocity().getY() / 20);
-
-        if (boids[i].getPosition().getX() < -5) {
-            boids[i].getPosition().setX(-5);
-            boids[i].getVelocity().revertX();
-        }
-        else if (boids[i].getPosition().getX() > 5) {
-            boids[i].getPosition().setX(5);
-            boids[i].getVelocity().revertX();
-        }
-
-        if (boids[i].getPosition().getY() < -5) {
-            boids[i].getPosition().setY(-5);
-            boids[i].getVelocity().revertY();
-        }
-        else if (boids[i].getPosition().getY() > 5) {
-            boids[i].getPosition().setY(5);
-            boids[i].getVelocity().revertY();
-        }
+        boids[i].getPosition().ajouter(boids[i].getVelocity().getX() / 20, boids[i].getVelocity().getY() / 20); // Déplacement de tous les individus
     }
 }
 

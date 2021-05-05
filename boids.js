@@ -7,23 +7,37 @@ class Position {
 
     getX() { return this.x; }
     getY() { return this.y; }
-    setX(x) { this.x = x; console.log(this.x);}
+    setX(x) { this.x = x; }
     setY(y) { this.y = y; }
     ajouter(x, y) {
         this.x += x;
         this.y += y;
     }
 
-    getAngle() { return Math.acos(this.x); }   // cos = adjacent / hypothèse (Pythagore)
+    getAngle() { 
+        if (this.y < 0)
+            return - Math.acos(this.x) / this.getDistance(new Position(0, 0));   // cos = adjacent / hypothénuse (Pythagore)
+        else
+            return Math.acos(this.x) / this.getDistance(new Position(0, 0));
+    }
 
     revertX() { this.x = this.x * -1; }
     revertY() { this.y = this.y * -1; }
+
+    normalize() {
+        var distance = this.getDistance(new Position(0, 0));
+        this.x = this.x / distance;
+        this.y = this.y / distance;
+    }
+
+    getDistance(point2) { return Math.sqrt(Math.pow(this.x - point2.getX(), 2) + Math.pow(this.y - point2.getY(), 2)); }
 }
 
 class boid {
     constructor(position, orientation) {
       this.position = position;
       this.orientation = orientation;
+      this.orientation.normalize();
     }
 
     //get position() { return this.getPosition(); }
@@ -33,7 +47,9 @@ class boid {
     getOrientation() { return this.orientation; }
 
     setPosition(position) { this.position = position; }
-    setOrientation(orientation) { this.orientation = orientation; }
+    setOrientation(orientation) { this.orientation = orientation; this.orientation.normalize(); }
+
+    getDistance(boid) { return this.position.getDistance(boid.getPosition()); }
 }
 
 // --------------------------------------------------------------
@@ -52,8 +68,9 @@ var squareRotation = 0.0;
 let boids = [];
 for (var i = 0; i < 10; i++)
 {
-    var angle = Math.random() * 360;
-    boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.cos(angle), Math.sin(angle)) ));
+    //var angle = Math.random() * 2*Math.PI;
+    //boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.cos(angle), Math.sin(angle)) ));
+    boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.random(), Math.random()) ));
 }
 console.log(boids);
 console.log("initialisation fini");
@@ -360,9 +377,128 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     }
 
 
+    
+
+    
     for (var i = 0; i < boids.length; i++)
     {
-        boids[i].getPosition().ajouter(boids[i].getOrientation().getX()/20, boids[i].getOrientation().getY()/20);
+        let boidsTropProche = [];
+        let boidsUnPeuProche = [];
+        let boidsUnPeuLoin = [];
+
+        for (var j = 0; j < boids.length; j++)
+        {
+            if (i != j) // On ne compare pas un individu à lui-même
+            {
+                if (boids[i].getDistance(boids[j]) < 1.1) // Trop proche
+                {
+                    boidsTropProche.push(boids[j]);
+                }
+                else if (boids[i].getDistance(boids[j]) < 2) // Un Peu Trop proche
+                {
+                    boidsUnPeuProche.push(boids[j]);
+                }
+                else if (boids[i].getDistance(boids[j]) < 3) // Un Peu Loin
+                {
+                    boidsUnPeuLoin.push(boids[j]);
+                }
+            }
+        }
+
+        var facteur1 = new Position(0, 0);
+        var facteur2 = new Position(0, 0);
+        var facteur3 = new Position(0, 0);
+
+        if (boidsTropProche.length > 0)     // RULE "2"
+        {
+            for (var j  = 0; j < boidsTropProche.length; j++)
+            {
+                facteur1.ajouter(boids[i].getPosition().getX() - boidsTropProche[j].getPosition().getX(), boids[i].getPosition().getY() - boidsTropProche[j].getPosition().getY())
+            }
+        }
+
+        if (boidsUnPeuProche.length > 0)     // RULE "3"
+        {
+            for (var j  = 0; j < boidsUnPeuProche.length; j++)
+            {
+                facteur2.ajouter(boidsUnPeuProche[j].getOrientation().getX(), boidsUnPeuProche[j].getOrientation().getY())
+            }
+
+            facteur2.setX(facteur2.getX() / boidsUnPeuProche.length);
+            facteur2.setY(facteur2.getY() / boidsUnPeuProche.length);
+
+            facteur2.setX((facteur2.getX() - boids[i].getOrientation().getX()) / 8);
+            facteur2.setY((facteur2.getY() - boids[i].getOrientation().getY()) / 8);
+        }
+
+        if (boidsUnPeuLoin.length > 0)      // RULE "1"
+        {
+            var n = 0;
+            for (var j  = 0; j < boidsUnPeuLoin.length; j++)
+            {
+                //var importance = boids[i].getDistance(boidsTropProche[j]);
+                //n = n + 1/importance;
+                /*facteur1.ajouter(Math.abs(boids[i].getPosition().getX()-boidsTropProche[j].getPosition().getX())*(1/importance),
+                                 Math.abs(boids[i].getPosition().getY()-boidsTropProche[j].getPosition().getY())*(1/importance));*/
+                n = n + 1;
+                facteur3.ajouter(boidsUnPeuLoin[j].getPosition().getX(), boidsUnPeuLoin[j].getPosition().getY());
+            }
+            //console.log(n);
+            facteur3.setX(facteur3.getX() / n);    // Calcul de la moyenne des éléments proches avec une importance inversement proportionnelle à la distance
+            facteur3.setY(facteur3.getY() / n);
+
+            facteur3.setX((facteur3.getX() - boids[i].getPosition().getX()) / 100);
+            facteur3.setY((facteur3.getY() - boids[i].getPosition().getY()) / 100);
+            
+
+            /*if (facteur1.getY() < 0)
+                angle1 = Math.acos(facteur1.getX() / boids[i].getPosition().getDistance(facteur1));
+            else
+                angle1 = Math.acos(facteur1.getX() / boids[i].getPosition().getDistance(facteur1));*/
+            //console.log(angle);
+
+            //boids[i].setOrientation(new Position(Math.cos(angle), Math.sin(angle)) );
+        }
+
+        /*if (boidsUnPeuProche.length > 0)
+        {
+            var n = 0;
+            var facteur2 = new Position(0, 0);
+            for (var j = 0; j < boidsUnPeuProche.length; j++)
+            {
+                n = n+1;
+                facteur2.ajouter(boidsUnPeuProche[j].getOrientation().getX(), boidsUnPeuProche[j].getOrientation().getY());
+            }
+            //console.log(n);
+            facteur2.setX(facteur2.getX() / n);    // Calcul de la moyenne
+            facteur2.setY(facteur2.getY() / n);
+
+            //angle2 = Math.acos(facteur2.getX() / boids[i].getPosition().getDistance(facteur2)) / 2;
+            //angle2 = 0;
+            var hypo = Math.sqrt(Math.pow(facteur2.getX(), 2) + Math.pow(facteur2.getY(), 2));
+            if (facteur2.getY() < 0)
+                angle2 = - Math.acos(facteur2.getX() / hypo) / 100;
+            else
+                angle2 = Math.acos(facteur2.getX() / hypo) / 100;
+
+
+                angle2 = Math.acos(facteur2.getX() / hypo) / 100;
+            //console.log(angle);
+
+            //boids[i].setOrientation(new Position(Math.cos(angle), Math.sin(angle)) );
+        }*/
+        /*var angle = (boids[i].getOrientation().getAngle() + angle1) + angle2;
+        boids[i].setOrientation(new Position(Math.cos(angle), Math.sin(angle) ));*/
+        boids[i].setOrientation(new Position(boids[i].getOrientation().getX() + facteur1.getX() + facteur2.getX() + facteur3.getX(), boids[i].getOrientation().getY() + facteur1.getY() + facteur2.getY() + facteur3.getY() ));
+    }
+    
+
+
+
+    // Pour ne pas disparaitre de l'écran
+    for (var i = 0; i < boids.length; i++)
+    {
+        boids[i].getPosition().ajouter(boids[i].getOrientation().getX() / 20, boids[i].getOrientation().getY() / 20);
 
         if (boids[i].getPosition().getX() < -5) {
             boids[i].getPosition().setX(-5);
@@ -382,7 +518,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
             boids[i].getOrientation().revertY();
         }
     }
-    
+
     //squareRotation += deltaTime / 2;    // 2 fois plus lent
 }
 

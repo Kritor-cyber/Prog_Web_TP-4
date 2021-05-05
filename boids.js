@@ -34,20 +34,18 @@ class Position {
 }
 
 class boid {
-    constructor(position, orientation) {
+    constructor(position, velocity) {
       this.position = position;
-      this.orientation = orientation;
-      this.orientation.normalize();
+      this.velocity = velocity;
+      this.velocity.normalize();
     }
 
-    //get position() { return this.getPosition(); }
     getPosition() { return this.position; }
 
-    //get orientation() { return this.getOrientation(); }
-    getOrientation() { return this.orientation; }
+    getVelocity() { return this.velocity; }
 
     setPosition(position) { this.position = position; }
-    setOrientation(orientation) { this.orientation = orientation; this.orientation.normalize(); }
+    setVelocity(velocity) { this.velocity = velocity; this.velocity.normalize(); }
 
     getDistance(boid) { return this.position.getDistance(boid.getPosition()); }
 }
@@ -68,8 +66,6 @@ var squareRotation = 0.0;
 let boids = [];
 for (var i = 0; i < 10; i++)
 {
-    //var angle = Math.random() * 2*Math.PI;
-    //boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.cos(angle), Math.sin(angle)) ));
     boids.push(new boid(new Position(Math.random()*10-5, Math.random()*10-5), new Position(Math.random(), Math.random()) ));
 }
 console.log(boids);
@@ -175,28 +171,24 @@ function initBuffers(gl) {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    // Now create an array of positions for the square.
-
+    // Ici on définit la forme des objets
     const positions = [
         -0.5, -0.5,
-        0.5, -0.5,
+        0.5, 0.0,
+        -0.25, 0.0,
         -0.5, 0.5,
-        0.5, 0.5,
     ];
 
-    // Now pass the list of positions into WebGL to build the
-    // shape. We do this by creating a Float32Array from the
-    // JavaScript array, then use it to fill the current buffer.
 
     gl.bufferData(gl.ARRAY_BUFFER,
         new Float32Array(positions),
         gl.STATIC_DRAW);
 
     const colors = [
-        1.0, 1.0, 1.0, 1.0,    // white
-        1.0, 0.0, 0.0, 1.0,    // red
-        0.0, 1.0, 0.0, 1.0,    // green
-        0.0, 0.0, 1.0, 1.0,    // blue
+        0.0, 0.0, 1.0, 1.0,    // RGBA (Rouge + Vert + Bleu + Transparence)
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
     ];
     const colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
@@ -208,11 +200,9 @@ function initBuffers(gl) {
     };
 }
 
-//
-// Draw the scene.
-//
+
 function drawScene(gl, programInfo, buffers, deltaTime) {
-    gl.clearColor(1.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+    gl.clearColor(0.0, 1.0, 1.0, 1.0);  // Fond de couleur Cyan
     gl.clearDepth(1.0);                 // Clear everything
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
@@ -221,12 +211,6 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Create a perspective matrix, a special matrix that is
-    // used to simulate the distortion of perspective in a camera.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
 
     const fieldOfView = 45 * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -245,22 +229,6 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
     modelViewMatrix = mat4.create();
-
-    // Now move the drawing position a bit to where we want to
-    // start drawing the square.
-
-    /*mat4.translate(modelViewMatrix,     // destination matrix
-        modelViewMatrix,     // matrix to translate
-        [0.0, 0.0, -3.0]);  // amount to translate
-    mat4.translate(modelViewMatrix,     // destination matrix
-        modelViewMatrix,     // matrix to translate
-        [0.0, 1.0, 0.0]);  // amount to translate
-
-    // ROTATE THE SQUARE
-    mat4.rotate(modelViewMatrix,
-        modelViewMatrix,
-        squareRotation,
-        [0, 0, 1]);*/
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
@@ -311,48 +279,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
         programInfo.uniformLocations.projectionMatrix,
         false,
         projectionMatrix);
-    /*gl.uniformMatrix4fv(
-        programInfo.uniformLocations.modelViewMatrix,
-        false,
-        modelViewMatrix);*/
-
-    /*{
-        const offset = 0;
-        const vertexCount = 4;
-        gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
-    }*/
-
-
-    //--------------------------------------
-    /*for (var y = 0; y < 10; y++)  //  Affichage d'un carré constitué de 10 carrés par 10 carrés qui tournent sur eux-mêmes
-    {
-        modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix,     // destination matrix
-            modelViewMatrix,     // matrix to translate
-            [-7.5, (y*1.5)-7.5, -20.0]);
-        for (var x = 0; x < 10; x++)
-        {
-            mat4.translate(modelViewMatrix,
-                modelViewMatrix,
-                [1.5, 0.0, 0]);
-            var copy = mat4.create();
-            mat4.rotate(copy,
-                modelViewMatrix,
-                squareRotation,
-                [0, 0, 1]);
-
-            gl.uniformMatrix4fv(
-                programInfo.uniformLocations.modelViewMatrix,
-                false,
-                copy);
-            
-            {
-                const offset = 0;
-                const vertexCount = 4;
-                gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
-            }
-        }
-    }*/
+    
     modelViewMatrix = mat4.create();
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
@@ -362,7 +289,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     {
         mat = mat4.create();
         mat4.translate(mat, modelViewMatrix, [boids[i].getPosition().getX(), boids[i].getPosition().getY(), 0.0]);
-        mat4.rotate(mat, mat, boids[i].getOrientation().getAngle(), [0, 0, 1.0]);
+        mat4.rotate(mat, mat, boids[i].getVelocity().getAngle(), [0, 0, 1.0]);
 
         gl.uniformMatrix4fv(
             programInfo.uniformLocations.modelViewMatrix,
@@ -375,10 +302,6 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
             gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
         }
     }
-
-
-    
-
     
     for (var i = 0; i < boids.length; i++)
     {
@@ -421,75 +344,32 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
         {
             for (var j  = 0; j < boidsUnPeuProche.length; j++)
             {
-                facteur2.ajouter(boidsUnPeuProche[j].getOrientation().getX(), boidsUnPeuProche[j].getOrientation().getY())
+                facteur2.ajouter(boidsUnPeuProche[j].getVelocity().getX(), boidsUnPeuProche[j].getVelocity().getY())
             }
 
             facteur2.setX(facteur2.getX() / boidsUnPeuProche.length);
             facteur2.setY(facteur2.getY() / boidsUnPeuProche.length);
 
-            facteur2.setX((facteur2.getX() - boids[i].getOrientation().getX()) / 8);
-            facteur2.setY((facteur2.getY() - boids[i].getOrientation().getY()) / 8);
+            facteur2.setX((facteur2.getX() - boids[i].getVelocity().getX()) / 8);
+            facteur2.setY((facteur2.getY() - boids[i].getVelocity().getY()) / 8);
         }
 
         if (boidsUnPeuLoin.length > 0)      // RULE "1"
         {
-            var n = 0;
             for (var j  = 0; j < boidsUnPeuLoin.length; j++)
             {
-                //var importance = boids[i].getDistance(boidsTropProche[j]);
-                //n = n + 1/importance;
-                /*facteur1.ajouter(Math.abs(boids[i].getPosition().getX()-boidsTropProche[j].getPosition().getX())*(1/importance),
-                                 Math.abs(boids[i].getPosition().getY()-boidsTropProche[j].getPosition().getY())*(1/importance));*/
-                n = n + 1;
                 facteur3.ajouter(boidsUnPeuLoin[j].getPosition().getX(), boidsUnPeuLoin[j].getPosition().getY());
             }
-            //console.log(n);
-            facteur3.setX(facteur3.getX() / n);    // Calcul de la moyenne des éléments proches avec une importance inversement proportionnelle à la distance
-            facteur3.setY(facteur3.getY() / n);
+            facteur3.setX(facteur3.getX() / boidsUnPeuLoin.length);    // Calcul de la moyenne des éléments proches avec une importance inversement proportionnelle à la distance
+            facteur3.setY(facteur3.getY() / boidsUnPeuLoin.length);
 
             facteur3.setX((facteur3.getX() - boids[i].getPosition().getX()) / 100);
             facteur3.setY((facteur3.getY() - boids[i].getPosition().getY()) / 100);
             
 
-            /*if (facteur1.getY() < 0)
-                angle1 = Math.acos(facteur1.getX() / boids[i].getPosition().getDistance(facteur1));
-            else
-                angle1 = Math.acos(facteur1.getX() / boids[i].getPosition().getDistance(facteur1));*/
-            //console.log(angle);
-
-            //boids[i].setOrientation(new Position(Math.cos(angle), Math.sin(angle)) );
         }
 
-        /*if (boidsUnPeuProche.length > 0)
-        {
-            var n = 0;
-            var facteur2 = new Position(0, 0);
-            for (var j = 0; j < boidsUnPeuProche.length; j++)
-            {
-                n = n+1;
-                facteur2.ajouter(boidsUnPeuProche[j].getOrientation().getX(), boidsUnPeuProche[j].getOrientation().getY());
-            }
-            //console.log(n);
-            facteur2.setX(facteur2.getX() / n);    // Calcul de la moyenne
-            facteur2.setY(facteur2.getY() / n);
-
-            //angle2 = Math.acos(facteur2.getX() / boids[i].getPosition().getDistance(facteur2)) / 2;
-            //angle2 = 0;
-            var hypo = Math.sqrt(Math.pow(facteur2.getX(), 2) + Math.pow(facteur2.getY(), 2));
-            if (facteur2.getY() < 0)
-                angle2 = - Math.acos(facteur2.getX() / hypo) / 100;
-            else
-                angle2 = Math.acos(facteur2.getX() / hypo) / 100;
-
-
-                angle2 = Math.acos(facteur2.getX() / hypo) / 100;
-            //console.log(angle);
-
-            //boids[i].setOrientation(new Position(Math.cos(angle), Math.sin(angle)) );
-        }*/
-        /*var angle = (boids[i].getOrientation().getAngle() + angle1) + angle2;
-        boids[i].setOrientation(new Position(Math.cos(angle), Math.sin(angle) ));*/
-        boids[i].setOrientation(new Position(boids[i].getOrientation().getX() + facteur1.getX() + facteur2.getX() + facteur3.getX(), boids[i].getOrientation().getY() + facteur1.getY() + facteur2.getY() + facteur3.getY() ));
+        boids[i].setVelocity(new Position(boids[i].getVelocity().getX() + facteur1.getX() + facteur2.getX() + facteur3.getX(), boids[i].getVelocity().getY() + facteur1.getY() + facteur2.getY() + facteur3.getY() ));
     }
     
 
@@ -498,28 +378,26 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     // Pour ne pas disparaitre de l'écran
     for (var i = 0; i < boids.length; i++)
     {
-        boids[i].getPosition().ajouter(boids[i].getOrientation().getX() / 20, boids[i].getOrientation().getY() / 20);
+        boids[i].getPosition().ajouter(boids[i].getVelocity().getX() / 20, boids[i].getVelocity().getY() / 20);
 
         if (boids[i].getPosition().getX() < -5) {
             boids[i].getPosition().setX(-5);
-            boids[i].getOrientation().revertX();
+            boids[i].getVelocity().revertX();
         }
         else if (boids[i].getPosition().getX() > 5) {
             boids[i].getPosition().setX(5);
-            boids[i].getOrientation().revertX();
+            boids[i].getVelocity().revertX();
         }
 
         if (boids[i].getPosition().getY() < -5) {
             boids[i].getPosition().setY(-5);
-            boids[i].getOrientation().revertY();
+            boids[i].getVelocity().revertY();
         }
         else if (boids[i].getPosition().getY() > 5) {
             boids[i].getPosition().setY(5);
-            boids[i].getOrientation().revertY();
+            boids[i].getVelocity().revertY();
         }
     }
-
-    //squareRotation += deltaTime / 2;    // 2 fois plus lent
 }
 
 //
